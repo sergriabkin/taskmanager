@@ -1,5 +1,6 @@
 package com.taskmanager.controller;
 
+import com.taskmanager.aspect.Loggable;
 import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.model.Task;
 import com.taskmanager.repository.TaskRepository;
@@ -16,22 +17,26 @@ public class TaskController {
         this.repository = repository;
     }
 
+    @Loggable
     @PostMapping("/tasks")
     public Task addTask(@RequestBody Task task) {
         return repository.save(task);
     }
 
+    @Loggable
     @GetMapping("/tasks")
     public List<Task> getAll() {
         return repository.findAll();
     }
 
+    @Loggable
     @GetMapping("/tasks/{id}")
     public Task getOne(@PathVariable long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
+    @Loggable
     @PutMapping("/tasks/{id}")
     public Task updateTask(@RequestBody Task requestTask, @PathVariable long id){
         return repository.findById(id)
@@ -48,6 +53,7 @@ public class TaskController {
         return repository.save(requestTask);
     }
 
+    @Loggable
     @DeleteMapping("/tasks/{id}")
     public void deleteTask(@PathVariable long id){
         repository.deleteById(id);
