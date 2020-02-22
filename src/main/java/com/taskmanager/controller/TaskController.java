@@ -4,6 +4,8 @@ import com.taskmanager.aspect.Loggable;
 import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.model.Task;
 import com.taskmanager.repository.TaskRepository;
+import com.taskmanager.service.TaskService;
+import com.taskmanager.service.TaskServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,52 +13,40 @@ import java.util.List;
 @RestController
 public class TaskController {
 
-    private final TaskRepository repository;
+    private final TaskService service;
 
-    public TaskController(TaskRepository repository) {
-        this.repository = repository;
+    public TaskController(TaskService service) {
+        this.service = service;
     }
 
     @Loggable
     @PostMapping("/tasks")
     public Task addTask(@RequestBody Task task) {
-        return repository.save(task);
+        return service.addTask(task);
     }
 
     @Loggable
     @GetMapping("/tasks")
     public List<Task> getAll() {
-        return repository.findAll();
+        return service.getAll();
     }
 
     @Loggable
     @GetMapping("/tasks/{id}")
     public Task getOne(@PathVariable long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+        return service.getOne(id);
     }
 
     @Loggable
     @PutMapping("/tasks/{id}")
     public Task updateTask(@RequestBody Task requestTask, @PathVariable long id){
-        return repository.findById(id)
-                .map(task -> replaceTask(requestTask, id))
-                .orElse(addNewTask(requestTask));
-    }
-
-    private Task replaceTask(Task requestTask, long id) {
-        repository.deleteById(id);
-        return addTask(requestTask);
-    }
-
-    private Task addNewTask(Task requestTask) {
-        return repository.save(requestTask);
+        return service.updateTask(requestTask, id);
     }
 
     @Loggable
     @DeleteMapping("/tasks/{id}")
     public void deleteTask(@PathVariable long id){
-        repository.deleteById(id);
+        service.deleteTask(id);
     }
 
 }
