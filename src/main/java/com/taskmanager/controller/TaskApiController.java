@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class TaskController {
+@RequestMapping("/api")
+public class TaskApiController {
 
     private final TaskService service;
 
-    public TaskController(TaskService service) {
+    public TaskApiController(TaskService service) {
         this.service = service;
     }
 

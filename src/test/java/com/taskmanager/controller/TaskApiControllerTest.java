@@ -22,8 +22,8 @@ import java.util.List;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(TaskController.class)
-class TaskControllerTest {
+@WebMvcTest(TaskApiController.class)
+class TaskApiControllerTest {
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
     public static final String TEST_TITLE_1 = "TestTitle1";
