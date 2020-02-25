@@ -1,18 +1,25 @@
 package com.taskmanager.service;
 
 import com.taskmanager.model.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public interface TaskService {
 
-    public Task addTask(Task task);
+    Task addTask(Task task);
 
-    public List<Task> getAll();
+    List<Task> getAll();
 
-    public Task getOne(long id);
+    Page<Task> getAll(Pageable pageable);
 
-    public Task updateTask(Task requestTask, long id);
+    Page<Task> getAllFiltered(Pageable pageable, Predicate<Task> predicate);
 
-    public void deleteTask(long id);
+    Task getOne(long id);
+
+    Task updateTask(Task requestTask, long id);
+
+    void deleteTask(long id);
 }

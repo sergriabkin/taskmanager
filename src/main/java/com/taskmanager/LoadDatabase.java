@@ -14,8 +14,8 @@ public class LoadDatabase {
     @Bean
     CommandLineRunner initDatabase(TaskRepository repository) {
         return args -> {
-            log.info("Preloading " + repository.save(new Task("Wake up", "")));
-            log.info("Preloading " + repository.save(new Task("Brush the teeth", "")));
+            log.info("Preloading " + repository.save(new Task( "Wake up", "", 5)));
+            log.info("Preloading " + repository.save(new Task("Brush the teeth", "", 4)));
         };
     }
 }
