@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
-public class ConfigBeans {
+public class LoadDatabaseConfiguration {
     @Bean
     CommandLineRunner initDatabase(TaskRepository repository) {
         return args -> {
@@ -18,11 +18,4 @@ public class ConfigBeans {
             log.info("Preloading " + repository.save(new Task("Brush the teeth", "", 4)));
         };
     }
-
-    @Bean
-    TaskFilterUtil taskFilter() {
-        return new TaskFilterUtil() {
-        };
-    }
-
 }

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public interface TaskFilterUtil {
-    default List<Task> filterPageTasks(Page<Task> allPageTasks, Predicate<Task> predicate){
+public class TaskFilterUtil {
+    public List<Task> filterPageTasks(Page<Task> allPageTasks, Predicate<Task> predicate){
         return allPageTasks.get()
                 .filter(predicate)
                 .collect(Collectors.toList());

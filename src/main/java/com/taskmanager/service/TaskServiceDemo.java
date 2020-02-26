@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Service
 public class TaskServiceDemo implements TaskService {
@@ -20,9 +19,9 @@ public class TaskServiceDemo implements TaskService {
     private final TaskRepository repository;
     private final TaskFilterUtil taskFilter;
 
-    public TaskServiceDemo(TaskRepository repository, TaskFilterUtil taskFilter) {
+    public TaskServiceDemo(TaskRepository repository) {
         this.repository = repository;
-        this.taskFilter = taskFilter;
+        taskFilter = new TaskFilterUtil();
     }
 
     public Task addTask(Task task) {
@@ -37,8 +36,12 @@ public class TaskServiceDemo implements TaskService {
     @Loggable
     public Page<Task> getAllUrgent(Pageable pageable) {
         Page<Task> allPageTasks = repository.findAll(pageable);
-        List<Task> tasksFiltered = taskFilter.filterPageTasks(allPageTasks, task -> task.getPriority() >= URGENT_PRIORITY);
+        List<Task> tasksFiltered = taskFilter.filterPageTasks(allPageTasks, this::isTaskUrgent);
         return new PageImpl<>(tasksFiltered, pageable, allPageTasks.getTotalElements());
+    }
+
+    private boolean isTaskUrgent(Task task) {
+        return task.getPriority() >= URGENT_PRIORITY;
     }
 
     @Loggable
