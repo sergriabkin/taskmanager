@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @Service
-public class TaskServiceImpl implements TaskService {
+public class TaskServiceDemo implements TaskService {
 
     public static final int URGENT_PRIORITY = 5;
     private final TaskRepository repository;
     private final TaskFilterUtil taskFilter;
 
-    public TaskServiceImpl(TaskRepository repository, TaskFilterUtil taskFilter) {
+    public TaskServiceDemo(TaskRepository repository, TaskFilterUtil taskFilter) {
         this.repository = repository;
         this.taskFilter = taskFilter;
     }

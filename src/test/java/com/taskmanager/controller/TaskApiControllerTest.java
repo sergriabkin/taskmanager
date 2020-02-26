@@ -35,7 +35,6 @@ class TaskApiControllerTest {
     public static final String TEST_DESCRIPTION_2 = "TestDescription2";
     public static final String ROOT_PATH = "/api";
 
-
     @MockBean
     private TaskService service;
     @Autowired
