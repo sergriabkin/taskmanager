@@ -32,7 +32,7 @@ public class TaskApiController {
     @Loggable
     @GetMapping("/tasks/urgent")
     public Page<Task> getAllUrgent(Pageable pageable) {
-        return service.getAllFiltered(pageable, task -> task.getPriority() >= 5);
+        return service.getAllUrgent(pageable);
     }
 
     @Loggable

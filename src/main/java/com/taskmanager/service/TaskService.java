@@ -11,11 +11,9 @@ public interface TaskService {
 
     Task addTask(Task task);
 
-    List<Task> getAll();
-
     Page<Task> getAll(Pageable pageable);
 
-    Page<Task> getAllFiltered(Pageable pageable, Predicate<Task> predicate);
+    Page<Task> getAllUrgent(Pageable pageable);
 
     Task getOne(long id);
 

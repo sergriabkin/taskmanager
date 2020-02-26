@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 @Service
 public class TaskServiceImpl implements TaskService {
 
+    public static final int URGENT_PRIORITY = 5;
     private final TaskRepository repository;
     private final TaskFilterUtil taskFilter;
 
@@ -29,20 +30,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Loggable
-    public List<Task> getAll() {
-        return repository.findAll();
-    }
-
-    @Loggable
     public Page<Task> getAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
     @Loggable
-
-    public Page<Task> getAllFiltered(Pageable pageable, Predicate<Task> predicate) {
+    public Page<Task> getAllUrgent(Pageable pageable) {
         Page<Task> allPageTasks = repository.findAll(pageable);
-        List<Task> tasksFiltered = taskFilter.filterPageTasks(allPageTasks, predicate);
+        List<Task> tasksFiltered = taskFilter.filterPageTasks(allPageTasks, task -> task.getPriority() >= URGENT_PRIORITY);
         return new PageImpl<>(tasksFiltered, pageable, allPageTasks.getTotalElements());
     }
 
