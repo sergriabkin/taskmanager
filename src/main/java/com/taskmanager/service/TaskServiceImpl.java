@@ -4,6 +4,7 @@ import com.taskmanager.aspect.Loggable;
 import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.model.Task;
 import com.taskmanager.repository.TaskRepository;
+import com.taskmanager.utils.TaskFilterUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -11,15 +12,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository repository;
+    private final TaskFilterUtil taskFilter;
 
-    public TaskServiceImpl(TaskRepository repository) {
+    public TaskServiceImpl(TaskRepository repository, TaskFilterUtil taskFilter) {
         this.repository = repository;
+        this.taskFilter = taskFilter;
     }
 
     public Task addTask(Task task) {
@@ -37,12 +39,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Loggable
+
     public Page<Task> getAllFiltered(Pageable pageable, Predicate<Task> predicate) {
-        Page<Task> all = repository.findAll(pageable);
-        List<Task> tasks = all.get()
-                .filter(predicate)
-                .collect(Collectors.toList());
-        return new PageImpl<>(tasks);
+        Page<Task> allPageTasks = repository.findAll(pageable);
+        List<Task> tasksFiltered = taskFilter.filterPageTasks(allPageTasks, predicate);
+        return new PageImpl<>(tasksFiltered, pageable, allPageTasks.getTotalElements());
     }
 
     @Loggable
