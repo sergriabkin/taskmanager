@@ -52,17 +52,9 @@ public class TaskServiceDemo implements TaskService {
 
     @Loggable
     public Task updateTask(Task requestTask, long id) {
-        return repository.findById(id)
-                .map(task -> replaceTask(requestTask, id))
-                .orElse(addNewTask(requestTask));
-    }
-
-    private Task replaceTask(Task requestTask, long id) {
-        repository.deleteById(id);
-        return addTask(requestTask);
-    }
-
-    private Task addNewTask(Task requestTask) {
+        if (repository.findById(id).isPresent()) {
+            repository.deleteById(id);
+        }
         return repository.save(requestTask);
     }
 

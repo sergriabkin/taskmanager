@@ -108,15 +108,51 @@ class TaskServiceDemoTest {
 
         Mockito.when(repository.findById(testId)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(TaskNotFoundException.class , () -> instance.getOne(testId));
+        Assertions.assertThrows(TaskNotFoundException.class, () -> instance.getOne(testId));
     }
 
     @Test
-    void updateTask() {
+    void updateTaskWithCreation() {
+        long testId = 1L;
+        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
 
+        Mockito.when(repository.findById(testId)).thenReturn(Optional.empty());
+        Mockito.when(repository.save(mockTask)).thenReturn(mockTask);
+
+        Task actualTask = instance.updateTask(mockTask, testId);
+
+        Mockito.verify(repository).findById(testId);
+        Mockito.verify(repository).save(mockTask);
+
+        Assert.assertEquals(mockTask, actualTask);
+    }
+
+    @Test
+    void updateTaskWithReplacement() {
+        long testId = 1L;
+        Task mockOldTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
+        Task mockNewTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_2);
+
+        Mockito.when(repository.findById(testId)).thenReturn(Optional.of(mockOldTask));
+        Mockito.doNothing().when(repository).deleteById(testId);
+        Mockito.when(repository.save(mockNewTask)).thenReturn(mockNewTask);
+
+        Task actualTask = instance.updateTask(mockNewTask, testId);
+
+        Mockito.verify(repository).findById(testId);
+        Mockito.verify(repository).deleteById(testId);
+        Mockito.verify(repository).save(mockNewTask);
+
+        Assert.assertEquals(mockNewTask, actualTask);
     }
 
     @Test
     void deleteTask() {
+        long testId = 1L;
+        Mockito.doNothing().when(repository).deleteById(testId);
+
+        instance.deleteTask(testId);
+
+        Mockito.verify(repository).deleteById(testId);
     }
 }
