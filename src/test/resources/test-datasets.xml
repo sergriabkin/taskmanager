@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <task TASK_ID="1" title="TestTitle1" description="TestDescription1" priority="5"/>
+  <task TASK_ID="2" title="TestTitle2" description="TestDescription2" priority="4"/>
+</dataset>
