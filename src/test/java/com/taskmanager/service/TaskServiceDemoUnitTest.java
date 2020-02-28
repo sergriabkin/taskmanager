@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class TaskServiceDemoTest {
+class TaskServiceDemoUnitTest {
 
     public static final String TEST_TITLE_1 = "TestTitle1";
     public static final String TEST_DESCRIPTION_1 = "TestDescription1";

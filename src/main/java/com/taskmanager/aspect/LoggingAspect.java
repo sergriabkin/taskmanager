@@ -37,10 +37,12 @@ public class LoggingAspect {
                 message.append("arg=").append(arg).append("|");
             });
         }
-        if (returnValue instanceof Collection) {
-            message.append(" | returning ").append(((Collection) returnValue).size()).append(" instance(s)");
-        } else {
-            message.append(" | returning ").append(returnValue.toString());
+        if (null != returnValue) {
+            if (returnValue instanceof Collection) {
+                message.append(" | returning ").append(((Collection) returnValue).size()).append(" instance(s)");
+            } else {
+                message.append(" | returning ").append(returnValue.toString());
+            }
         }
         LOGGER.info(message.toString());
         return returnValue;
