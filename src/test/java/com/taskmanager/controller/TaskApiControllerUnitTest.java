@@ -26,7 +26,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebMvcTest(TaskApiController.class)
-class TaskApiControllerTest {
+class TaskApiControllerUnitTest {
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
     public static final String TEST_TITLE_1 = "TestTitle1";
@@ -37,6 +37,7 @@ class TaskApiControllerTest {
 
     @MockBean
     private TaskService service;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -52,6 +53,19 @@ class TaskApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString(TEST_TITLE_1)))
                 .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString(TEST_DESCRIPTION_1)));
+    }
+
+    @Test
+    void addTaskException() throws Exception {
+        BDDMockito.given(service.addTask(Mockito.any(Task.class))).willReturn(null);
+
+        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
+        String requestJson = new ObjectMapper().writer().writeValueAsString(mockTask);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(ROOT_PATH + "/tasks")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(requestJson))
+                .andExpect(MockMvcResultMatchers.status().is(200));
     }
 
     @Test
@@ -79,10 +93,19 @@ class TaskApiControllerTest {
     }
 
     @Test
-    void updateTask() {
+    void updateTask() throws Exception {
+        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
+        String requestJson = new ObjectMapper().writer().writeValueAsString(mockTask);
+
+        mockMvc.perform(MockMvcRequestBuilders.put(ROOT_PATH + "/tasks/100")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(requestJson))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    void deleteTask() {
+    void deleteTask() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(ROOT_PATH + "/tasks/100"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
