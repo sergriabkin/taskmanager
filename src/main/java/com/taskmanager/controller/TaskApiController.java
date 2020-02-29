@@ -1,14 +1,11 @@
 package com.taskmanager.controller;
 
 import com.taskmanager.aspect.Loggable;
-import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.model.Task;
-import com.taskmanager.repository.TaskRepository;
 import com.taskmanager.service.TaskService;
-import com.taskmanager.service.TaskServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -28,8 +25,14 @@ public class TaskApiController {
 
     @Loggable
     @GetMapping("/tasks")
-    public List<Task> getAll() {
-        return service.getAll();
+    public Page<Task> getAll(Pageable pageable) {
+        return service.getAll(pageable);
+    }
+
+    @Loggable
+    @GetMapping("/tasks/urgent")
+    public Page<Task> getAllUrgent(Pageable pageable) {
+        return service.getAllUrgent(pageable);
     }
 
     @Loggable
@@ -40,13 +43,13 @@ public class TaskApiController {
 
     @Loggable
     @PutMapping("/tasks/{id}")
-    public Task updateTask(@RequestBody Task requestTask, @PathVariable long id){
+    public Task updateTask(@RequestBody Task requestTask, @PathVariable long id) {
         return service.updateTask(requestTask, id);
     }
 
     @Loggable
     @DeleteMapping("/tasks/{id}")
-    public void deleteTask(@PathVariable long id){
+    public void deleteTask(@PathVariable long id) {
         service.deleteTask(id);
     }
 
