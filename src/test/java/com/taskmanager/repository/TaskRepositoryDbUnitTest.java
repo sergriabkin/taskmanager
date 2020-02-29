@@ -39,7 +39,7 @@ public class TaskRepositoryDbUnitTest {
 
     @Test
     public void findByTitle() {
-        Task actualTask = instance.findByTitle(TEST_TITLE_1);
+        Task actualTask = instance.findByTitle(TEST_TITLE_1).get();
 
         assertThat(actualTask.getTitle(), CoreMatchers.is(TEST_TITLE_1));
         assertThat(actualTask.getDescription(), CoreMatchers.is(TEST_DESCRIPTION_1));

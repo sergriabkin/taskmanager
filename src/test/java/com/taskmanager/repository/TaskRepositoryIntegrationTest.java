@@ -32,7 +32,7 @@ public class TaskRepositoryIntegrationTest {
         Task testTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
         entityManager.persist(testTask);
 
-        Task actualTask = instance.findByTitle(TEST_TITLE_1);
+        Task actualTask = instance.findByTitle(TEST_TITLE_1).get();
 
         assertNotNull(actualTask);
         assertNotNull(actualTask.getTaskId());
