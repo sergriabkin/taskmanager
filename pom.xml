@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>elontask</artifactId>
 	<version>0.0.2</version>
 	<name>elontask</name>
 	<description>Task manager</description>
