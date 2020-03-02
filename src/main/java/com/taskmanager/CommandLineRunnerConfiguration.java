@@ -10,12 +10,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
-public class LoadDatabaseConfiguration {
+public class CommandLineRunnerConfiguration {
     @Bean
-    CommandLineRunner initDatabase(TaskRepository repository) {
+    CommandLineRunner checkDatabaseContent(TaskRepository repository) {
         return args -> {
-//            log.info("Preloading " + repository.save(new Task("Wake up", "", 5)));
-//            log.info("Preloading " + repository.save(new Task("Brush the teeth", "", 4)));
+            repository.findAll().forEach( task -> log.info("Task is present in DB: " + task));
         };
     }
 }

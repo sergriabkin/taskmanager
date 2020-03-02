@@ -1,3 +1,7 @@
+  insert into task (title, description, priority) values
+  ('Wake up', 'at 6:30', 5),
+  ('Take a brush and put a little makeup', 'from 6:35 to 6:40', 4);
+
 -- USER
 -- hashed password: letmein
 INSERT INTO security_user (id, username, password, first_name, last_name) VALUES
