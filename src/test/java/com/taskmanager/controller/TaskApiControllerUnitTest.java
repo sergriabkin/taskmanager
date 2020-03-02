@@ -1,111 +1,132 @@
 package com.taskmanager.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskmanager.model.Task;
 import com.taskmanager.service.TaskService;
 import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(TaskApiController.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 class TaskApiControllerUnitTest {
 
-    public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
     public static final String TEST_TITLE_1 = "TestTitle1";
     public static final String TEST_DESCRIPTION_1 = "TestDescription1";
     public static final String TEST_TITLE_2 = "TestTitle2";
     public static final String TEST_DESCRIPTION_2 = "TestDescription2";
-    public static final String ROOT_PATH = "/api";
+    public static final String TASKS_URL = "/api/tasks";
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private TestHeadersGenerator headersGenerator;
 
     @MockBean
     private TaskService service;
 
-    @Autowired
-    private MockMvc mockMvc;
-
     @Test
-    void addTask() throws Exception {
+    void addTask() {
         Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-        String requestJson = new ObjectMapper().writer().writeValueAsString(mockTask);
-        BDDMockito.given(service.addTask(mockTask)).willReturn(mockTask);
+        HttpEntity<Task> httpEntity = new HttpEntity<>(mockTask, headersGenerator.withRole("ROLE_CSR"));
 
-        mockMvc.perform(MockMvcRequestBuilders.post(ROOT_PATH + "/tasks")
-                .contentType(APPLICATION_JSON_UTF8)
-                .content(requestJson))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString(TEST_TITLE_1)))
-                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString(TEST_DESCRIPTION_1)));
+        BDDMockito.given(service.addTask(mockTask))
+                .willReturn(mockTask);
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(TASKS_URL, HttpMethod.POST, httpEntity, String.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Mockito.verify(service).addTask(Mockito.any(Task.class));
+
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
     }
 
     @Test
-    void addTaskException() throws Exception {
-        BDDMockito.given(service.addTask(Mockito.any(Task.class))).willReturn(null);
-
-        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-        String requestJson = new ObjectMapper().writer().writeValueAsString(mockTask);
-
-        mockMvc.perform(MockMvcRequestBuilders.post(ROOT_PATH + "/tasks")
-                .contentType(APPLICATION_JSON_UTF8)
-                .content(requestJson))
-                .andExpect(MockMvcResultMatchers.status().is(200));
-    }
-
-    @Test
-    void getAll() throws Exception {
+    void getAll() {
         List<Task> mockTasksList = new ArrayList<>();
         mockTasksList.add(new Task(TEST_TITLE_1, TEST_DESCRIPTION_1));
         mockTasksList.add(new Task(TEST_TITLE_2, TEST_DESCRIPTION_2));
+        Page<Task> mockPage = new PageImpl<>(mockTasksList, PageRequest.of(0, 10), 1);
 
-        BDDMockito.given(service.getAll(Mockito.mock(Pageable.class)))
-                .willReturn(new PageImpl<>(mockTasksList));
+        BDDMockito.given(service.getAll(Mockito.any(Pageable.class)))
+                .willReturn(mockPage);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(ROOT_PATH + "/tasks"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        ResponseEntity<String> responseEntity =
+                restTemplate.getForEntity(TASKS_URL, String.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Mockito.verify(service).getAll(Mockito.any(Pageable.class));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_2));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_2));
     }
 
+
     @Test
-    void getOne() throws Exception {
+    void getOne() {
         Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
         BDDMockito.given(service.getOne(100L)).willReturn(mockTask);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(ROOT_PATH + "/tasks/100"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString(TEST_TITLE_1)))
-                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString(TEST_DESCRIPTION_1)));
+        ResponseEntity<String> responseEntity =
+                restTemplate.getForEntity(TASKS_URL + "/100", String.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Mockito.verify(service).getOne(100L);
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
     }
 
     @Test
-    void updateTask() throws Exception {
+    void updateTask() {
         Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-        String requestJson = new ObjectMapper().writer().writeValueAsString(mockTask);
+        HttpEntity<Task> httpEntity = new HttpEntity<>(mockTask, headersGenerator.withRole("ROLE_CSR"));
 
-        mockMvc.perform(MockMvcRequestBuilders.put(ROOT_PATH + "/tasks/100")
-                .contentType(APPLICATION_JSON_UTF8)
-                .content(requestJson))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        BDDMockito.given(service.updateTask(mockTask, 100L))
+                .willReturn(mockTask);
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(TASKS_URL + "/100", HttpMethod.PUT, httpEntity, String.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Mockito.verify(service).updateTask(mockTask, 100L);
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
     }
 
+
     @Test
-    void deleteTask() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(ROOT_PATH + "/tasks/100"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    void deleteTask() {
+        Task mockTask = new Task(100L, TEST_TITLE_1, TEST_DESCRIPTION_1, 4);
+        HttpEntity<Task> httpEntity = new HttpEntity<>(mockTask, headersGenerator.withRole("ROLE_CSR"));
+
+        ResponseEntity<Void> responseEntity =
+                restTemplate.exchange(TASKS_URL + "/100", HttpMethod.DELETE, httpEntity, Void.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Mockito.verify(service).deleteTask(100L);
     }
 }
