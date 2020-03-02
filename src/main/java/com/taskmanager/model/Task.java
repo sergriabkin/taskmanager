@@ -10,12 +10,10 @@ import javax.validation.constraints.Min;
 @Data
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
-@SequenceGenerator(name = "taskId", initialValue = 100_000)
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "taskId")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long taskId;
 
     @Column
@@ -27,6 +25,9 @@ public class Task {
     @Range(min = 0, max = 5)
     @Column
     private Integer priority = 3;
+
+    public Task() {
+    }
 
     public Task(String title, String description) {
         this.title = title;
