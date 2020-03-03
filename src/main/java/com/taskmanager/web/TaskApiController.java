@@ -17,12 +17,10 @@ public class TaskApiController {
 
     private final TaskService service;
     private final TaskAssembler assembler;
-//    private final PagedResourcesAssembler<Task> pagedAssembler;
 
     public TaskApiController(TaskService service, TaskAssembler assembler) {
         this.service = service;
         this.assembler = assembler;
-//        this.pagedAssembler = pagedResourcesAssembler;
     }
 
     @Loggable

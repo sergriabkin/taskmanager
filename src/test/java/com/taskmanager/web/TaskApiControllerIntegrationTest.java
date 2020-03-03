@@ -1,58 +1,68 @@
 package com.taskmanager.web;
 
-import com.taskmanager.model.Task;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.taskmanager.dto.TaskDto;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.transaction.Transactional;
+import java.util.HashMap;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
 class TaskApiControllerIntegrationTest {
 
     public static final String TEST_TITLE_1 = "TestTitle1";
     public static final String TEST_DESCRIPTION_1 = "TestDescription1";
     public static final String TEST_TITLE_2 = "TestTitle2";
     public static final String TEST_DESCRIPTION_2 = "TestDescription2";
+    public static final String TASKS_URL = "/api/tasks";
 
     @Autowired
-    private TaskApiController instance;
+    private TestHeadersGenerator headersGenerator;
 
-//    @Test
-//    void addTask() {
-//        Task actualTask = instance.addTask(new Task(TEST_TITLE_1, TEST_DESCRIPTION_1));
-//
-//        Assert.assertNotNull(actualTask);
-//        Assert.assertNotNull(actualTask.getTaskId());
-//        Assert.assertEquals(actualTask.getTitle(), TEST_TITLE_1);
-//        Assert.assertEquals(actualTask.getDescription(), TEST_DESCRIPTION_1);
-//    }
-//
-//    @Test
-//    void getAll() {
-//        Task mockTask1 = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-//        Task mockTask2 = new Task(TEST_TITLE_2, TEST_DESCRIPTION_2);
-//
-//        instance.addTask(mockTask1);
-//        instance.addTask(mockTask2);
-//
-//        List<Task> actualTasksList = instance.getAll(Mockito.mock(Pageable.class)).get()
-//                .collect(Collectors.toList());
-//
-//        Assert.assertThat(actualTasksList, CoreMatchers.hasItems(mockTask1, mockTask2));
-//        Assert.assertThat(actualTasksList, CoreMatchers.everyItem(CoreMatchers.notNullValue(Task.class)));
-//        List<Long> taskIds = actualTasksList.stream().map(Task::getTaskId).collect(Collectors.toList());
-//        Assert.assertThat(taskIds, CoreMatchers.everyItem(CoreMatchers.notNullValue()));
-//    }
-//
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Test
+    void addTask() throws JsonProcessingException {
+        TaskDto inputTaskDto = new TaskDto(TEST_TITLE_1, TEST_DESCRIPTION_1, 4);
+        HttpEntity<TaskDto> httpEntity = new HttpEntity<>(inputTaskDto, headersGenerator.withRole("ROLE_CSR"));
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(TASKS_URL, HttpMethod.POST, httpEntity, String.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assert.assertNotNull(responseEntity.getBody());
+        HashMap<String, Object> response = new ObjectMapper().readValue(responseEntity.getBody(), HashMap.class);
+        Assert.assertThat(response.get("title").toString(), CoreMatchers.is(TEST_TITLE_1));
+        Assert.assertThat(response.get("description").toString(), CoreMatchers.is(TEST_DESCRIPTION_1));
+        Assert.assertThat(response.get("priority").toString(), CoreMatchers.is("4"));
+        Assert.assertThat(response.get("_links").toString(), CoreMatchers.containsString(TASKS_URL));
+    }
+
+    @Test
+    void getAll() {
+        ResponseEntity<String> responseEntity =
+                restTemplate.getForEntity(TASKS_URL, String.class);
+
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assert.assertNotNull(responseEntity.getBody());
+    }
+
 //    @Test
 //    void getOne() {
 //        Task addedTask = instance.addTask(new Task(TEST_TITLE_1, TEST_DESCRIPTION_1));
