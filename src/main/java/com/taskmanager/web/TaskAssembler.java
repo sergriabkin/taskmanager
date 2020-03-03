@@ -24,5 +24,4 @@ public class TaskAssembler extends RepresentationModelAssemblerSupport<Task, Tas
         taskDto.add(link.withSelfRel());
         return taskDto;
     }
-
 }
