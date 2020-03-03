@@ -17,12 +17,12 @@ public class TaskApiController {
 
     private final TaskService service;
     private final TaskAssembler assembler;
-    private final PagedResourcesAssembler<Task> pagedAssembler;
+//    private final PagedResourcesAssembler<Task> pagedAssembler;
 
-    public TaskApiController(TaskService service, TaskAssembler assembler, PagedResourcesAssembler<Task> pagedResourcesAssembler) {
+    public TaskApiController(TaskService service, TaskAssembler assembler) {
         this.service = service;
         this.assembler = assembler;
-        this.pagedAssembler = pagedResourcesAssembler;
+//        this.pagedAssembler = pagedResourcesAssembler;
     }
 
     @Loggable
@@ -35,14 +35,14 @@ public class TaskApiController {
 
     @Loggable
     @GetMapping("/tasks")
-    public PagedModel<TaskDto> getAll(Pageable pageable) {
+    public PagedModel<TaskDto> getAll(Pageable pageable, PagedResourcesAssembler<Task> pagedAssembler) {
         Page<Task> page = service.getAll(pageable);
         return pagedAssembler.toModel(page, assembler);
     }
 
     @Loggable
     @GetMapping("/tasks/urgent")
-    public PagedModel<TaskDto> getAllUrgent(Pageable pageable) {
+    public PagedModel<TaskDto> getAllUrgent(Pageable pageable, PagedResourcesAssembler<Task> pagedAssembler) {
         Page<Task> page = service.getAllUrgent(pageable);
         return pagedAssembler.toModel(page, assembler);
     }

@@ -3,6 +3,7 @@ package com.taskmanager.dto;
 import com.taskmanager.model.Task;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class TaskDto extends RepresentationModel<TaskDto> {
     @Size(max = 100)
     private String title;

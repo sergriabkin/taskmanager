@@ -1,8 +1,8 @@
 package com.taskmanager.web;
 
+import com.taskmanager.dto.TaskDto;
 import com.taskmanager.model.Task;
 import com.taskmanager.service.TaskService;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -48,80 +48,68 @@ class TaskApiControllerUnitTest {
 
     @Test
     void addTask() {
-        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-        HttpEntity<Task> httpEntity = new HttpEntity<>(mockTask, headersGenerator.withRole("ROLE_CSR"));
+        TaskDto mockTaskDto = new TaskDto(TEST_TITLE_1, TEST_DESCRIPTION_1);
+        HttpEntity<TaskDto> httpEntity = new HttpEntity<>(mockTaskDto, headersGenerator.withRole("ROLE_CSR"));
 
-        BDDMockito.given(service.addTask(mockTask))
-                .willReturn(mockTask);
+        BDDMockito.given(service.addTask(Mockito.any(Task.class))).willReturn(Mockito.mock(Task.class));
 
         ResponseEntity<String> responseEntity =
                 restTemplate.exchange(TASKS_URL, HttpMethod.POST, httpEntity, String.class);
 
-        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Mockito.verify(service).addTask(Mockito.any(Task.class));
 
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
+        Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Mockito.verify(service).addTask(Mockito.any(Task.class));
     }
 
     @Test
     void getAll() {
         List<Task> mockTasksList = new ArrayList<>();
-        mockTasksList.add(new Task(TEST_TITLE_1, TEST_DESCRIPTION_1));
-        mockTasksList.add(new Task(TEST_TITLE_2, TEST_DESCRIPTION_2));
+        mockTasksList.add(new Task(100L, TEST_TITLE_1, TEST_DESCRIPTION_1, 4));
+        mockTasksList.add(new Task(100L, TEST_TITLE_2, TEST_DESCRIPTION_2, 3));
         Page<Task> mockPage = new PageImpl<>(mockTasksList, PageRequest.of(0, 10), 1);
 
-        BDDMockito.given(service.getAll(Mockito.any(Pageable.class)))
-                .willReturn(mockPage);
+        Mockito.when(service.getAll(Mockito.any(Pageable.class))).thenReturn(mockPage);
 
         ResponseEntity<String> responseEntity =
                 restTemplate.getForEntity(TASKS_URL, String.class);
 
         Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Mockito.verify(service).getAll(Mockito.any(Pageable.class));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_2));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_2));
     }
 
 
     @Test
     void getOne() {
-        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-        BDDMockito.given(service.getOne(100L)).willReturn(mockTask);
+        BDDMockito.given(service.getOne(100L)).willReturn(Mockito.mock(Task.class));
 
         ResponseEntity<String> responseEntity =
                 restTemplate.getForEntity(TASKS_URL + "/100", String.class);
 
         Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Mockito.verify(service).getOne(100L);
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
     }
 
     @Test
     void updateTask() {
-        Task mockTask = new Task(TEST_TITLE_1, TEST_DESCRIPTION_1);
-        HttpEntity<Task> httpEntity = new HttpEntity<>(mockTask, headersGenerator.withRole("ROLE_CSR"));
+        TaskDto taskDto = new TaskDto(TEST_TITLE_1, TEST_DESCRIPTION_1);
+        HttpEntity<TaskDto> httpEntity = new HttpEntity<>(taskDto, headersGenerator.withRole("ROLE_CSR"));
 
-        BDDMockito.given(service.updateTask(mockTask, 100L))
-                .willReturn(mockTask);
+        BDDMockito.given(service.updateTask(Mockito.any(Task.class), Mockito.anyLong()))
+                .willReturn(Mockito.mock(Task.class));
 
         ResponseEntity<String> responseEntity =
                 restTemplate.exchange(TASKS_URL + "/100", HttpMethod.PUT, httpEntity, String.class);
 
         Assert.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Mockito.verify(service).updateTask(mockTask, 100L);
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
-        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
+        Mockito.verify(service).updateTask(Mockito.any(Task.class), Mockito.anyLong());
     }
 
 
     @Test
     void deleteTask() {
-        Task mockTask = new Task(100L, TEST_TITLE_1, TEST_DESCRIPTION_1, 4);
-        HttpEntity<Task> httpEntity = new HttpEntity<>(mockTask, headersGenerator.withRole("ROLE_CSR"));
+        TaskDto taskDto = new TaskDto(TEST_TITLE_1, TEST_DESCRIPTION_1);
+        HttpEntity<TaskDto> httpEntity = new HttpEntity<>(taskDto, headersGenerator.withRole("ROLE_CSR"));
 
         ResponseEntity<Void> responseEntity =
                 restTemplate.exchange(TASKS_URL + "/100", HttpMethod.DELETE, httpEntity, Void.class);
