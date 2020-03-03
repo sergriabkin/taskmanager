@@ -1,4 +1,4 @@
-package com.taskmanager.controller;
+package com.taskmanager.web;
 
 import com.taskmanager.model.Task;
 import com.taskmanager.service.TaskService;

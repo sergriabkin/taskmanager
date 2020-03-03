@@ -1,6 +1,6 @@
-package com.taskmanager.controller;
+package com.taskmanager.web;
 
-import com.taskmanager.model.LoginDto;
+import com.taskmanager.dto.LoginDto;
 import com.taskmanager.model.User;
 import com.taskmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
