@@ -4,10 +4,7 @@ import com.taskmanager.model.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-public interface TaskService {
+public interface TaskService { //todo getOneByTitle
 
     Task addTask(Task task);
 
