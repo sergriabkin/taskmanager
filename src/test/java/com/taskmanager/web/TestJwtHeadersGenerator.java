@@ -11,7 +11,7 @@ import java.util.Arrays;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
-public class TestHeadersGenerator {
+public class TestJwtHeadersGenerator {
 
     @Autowired
     private JwtProvider jwtProvider;

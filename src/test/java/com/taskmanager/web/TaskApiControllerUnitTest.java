@@ -41,7 +41,7 @@ class TaskApiControllerUnitTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private TestHeadersGenerator headersGenerator;
+    private TestJwtHeadersGenerator headersGenerator;
 
     @MockBean
     private TaskService service;
