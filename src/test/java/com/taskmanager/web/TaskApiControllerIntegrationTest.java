@@ -140,18 +140,21 @@ class TaskApiControllerIntegrationTest {
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_1));
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_1));
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_PRIORITY_1.toString()));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TASKS_URL));
     }
 
     private void assertSecondTaskInResponse(ResponseEntity<String> responseEntity) {
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_2));
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_2));
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_PRIORITY_2.toString()));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TASKS_URL));
     }
 
     private void assertThirdTaskInResponse(ResponseEntity<String> responseEntity) {
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_TITLE_3));
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_DESCRIPTION_3));
         Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TEST_PRIORITY_3.toString()));
+        Assert.assertThat(responseEntity.getBody(), CoreMatchers.containsString(TASKS_URL));
     }
 
 }
